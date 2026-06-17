@@ -1,0 +1,530 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kosci50 — Training Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B2620; --ink-2:#2C3A33; --ink-soft:#465A50;
+  --paper:#F2EDE4; --card:#FBF8F1; --card-2:#EDE6D8; --line:#DCD3C2; --line-2:#C9BFA9;
+  --sage:#6E8C7A; --slate:#4E6E82; --amber:#DD8338; --amber-2:#C26A26; --glow:#F2A862;
+  --stone:#9AA294; --rust:#B5523C;
+  --long:#2F5D50; --quality:#B5772E; --hills:#8C5A3C; --easy:#6E8C7A;
+  --bike:#4E6E82; --recovery:#93A091; --rest:#B3AC9C; --race:#DD8338;
+  --f1:#B5523C; --f2:#C2823E; --f3:#9AA294; --f4:#6E8C7A; --f5:#3E6B53;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+.mono{font-family:'Space Mono',monospace}
+.disp{font-family:'Space Grotesk',sans-serif}
+button{font-family:inherit;cursor:pointer}
+.eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ---------- header ---------- */
+header{background:var(--ink);color:var(--paper);padding:18px 22px 0;position:relative;overflow:hidden}
+.hwrap{max-width:1060px;margin:0 auto}
+.htop{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.title h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,4.4vw,34px);margin:0;letter-spacing:-.01em;line-height:1}
+.title .sub{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:#B9C4BB;margin-top:7px;text-transform:uppercase}
+.stats{display:flex;gap:22px;text-align:right}
+.stat .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(20px,3.4vw,28px);line-height:1;color:var(--glow)}
+.stat .l{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:#9FB0A4;margin-top:5px}
+.stat.alt .v{color:var(--paper)}
+.ridge{margin-top:6px}
+.ridge svg{display:block;width:100%;height:118px}
+.phaseband{display:flex;gap:0;margin-top:-2px;height:5px;border-radius:3px;overflow:hidden;opacity:.9}
+.phaseband i{display:block;flex:1}
+.savedtag{position:absolute;top:14px;right:22px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--glow);opacity:0;transition:opacity .3s}
+.savedtag.on{opacity:.85}
+
+/* ---------- tabs ---------- */
+.tabs{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.tabs .inner{max-width:1060px;margin:0 auto;display:flex;gap:4px;padding:0 14px}
+.tab{background:none;border:none;padding:15px 16px 13px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;color:var(--ink-soft);border-bottom:2.5px solid transparent;letter-spacing:-.01em}
+.tab .c{font-family:'Space Mono',monospace;font-size:11px;color:var(--stone);margin-left:6px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--amber)}
+.tab[aria-selected="true"] .c{color:var(--amber-2)}
+
+main{max-width:1060px;margin:0 auto;padding:22px 16px 90px}
+.panel{display:none;animation:fade .35s ease}
+.panel.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---------- schedule ---------- */
+.wk{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.wk.cur{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
+.wkhead{display:flex;align-items:center;gap:14px;padding:14px 16px;width:100%;background:none;border:none;text-align:left}
+.wknum{width:42px;height:42px;flex:0 0 42px;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;line-height:1}
+.wknum small{font-family:'Space Mono',monospace;font-size:7.5px;font-weight:400;letter-spacing:.1em;opacity:.85;margin-top:1px}
+.wkmeta{flex:1;min-width:0}
+.wkmeta .ph{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px}
+.wkmeta .fo{font-size:12px;color:var(--ink-soft);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wkmeta .fo.show{white-space:normal}
+.wkright{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.wkbar{width:62px;height:5px;background:var(--card-2);border-radius:3px;overflow:hidden}
+.wkbar i{display:block;height:100%;background:var(--amber);width:0;transition:width .35s}
+.curtag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--amber-2);background:#FBEEDD;padding:2px 6px;border-radius:4px;text-transform:uppercase}
+.chev{color:var(--stone);transition:transform .25s;flex:0 0 auto}
+.wk.open .chev{transform:rotate(90deg)}
+.days{display:none;border-top:1px solid var(--line);padding:6px 8px 10px}
+.wk.open .days{display:block}
+
+.day{display:flex;gap:12px;align-items:flex-start;padding:9px 8px;border-radius:9px}
+.day+.day{border-top:1px solid var(--card-2)}
+.day:hover{background:#fffdf8}
+.dcheck{flex:0 0 auto;width:24px;height:24px;border-radius:7px;border:2px solid var(--line-2);background:#fff;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:.18s;padding:0}
+.dcheck svg{width:14px;height:14px;opacity:0;transform:scale(.5);transition:.18s}
+.day.done .dcheck{background:var(--long);border-color:var(--long)}
+.day.done .dcheck svg{opacity:1;transform:scale(1)}
+.dbody{flex:1;min-width:0}
+.dtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--stone);width:30px;flex:0 0 auto}
+.cat{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:#fff;padding:1.5px 7px;border-radius:20px}
+.dtext{font-size:13px;color:var(--ink-2);margin-top:4px;padding-left:38px}
+.day.done .dtext{color:var(--stone)}
+.feelpill{display:inline-flex;align-items:center;gap:5px;margin-left:38px;margin-top:6px;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--ink-soft);background:var(--card-2);padding:3px 9px;border-radius:20px}
+.feeldot{width:9px;height:9px;border-radius:50%}
+.logbtn{margin-left:38px;margin-top:6px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber-2);background:none;border:1px dashed var(--line-2);padding:3px 9px;border-radius:20px}
+.day.done .logbtn{color:var(--ink-soft)}
+
+/* ---------- log editor ---------- */
+.editor{margin:8px 8px 4px 46px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;display:none}
+.editor.on{display:block}
+.edlab{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
+.feelrow{display:flex;gap:7px;flex-wrap:wrap}
+.feelbtn{flex:1;min-width:62px;border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:8px 4px;text-align:center;transition:.15s}
+.feelbtn .fe{font-size:17px}
+.feelbtn .fn{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:11px;margin-top:2px;color:var(--ink-2)}
+.feelbtn[aria-pressed="true"]{border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.feelbtn[aria-pressed="true"] .fn{color:#fff}
+.rpe{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.rpebtn{width:31px;height:31px;border-radius:7px;border:1.5px solid var(--line);background:#fff;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink-2);padding:0}
+.rpebtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.notes{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;font-family:Inter,sans-serif;font-size:13px;color:var(--ink);resize:vertical;min-height:54px;background:var(--card)}
+.notes:focus{outline:none;border-color:var(--amber)}
+.edrow{margin-top:13px}
+.eddone{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
+.btn{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--paper)}
+.btn.ghost{background:none;color:var(--ink-soft);border-color:var(--line-2)}
+.btn.markdone{background:var(--long);border-color:var(--long)}
+
+/* ---------- feel log ---------- */
+.trend{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+.trend h3{font-family:'Space Grotesk',sans-serif;margin:0 0 3px;font-size:15px}
+.trend p{margin:0 0 14px;font-size:12.5px;color:var(--ink-soft)}
+.spark{display:flex;align-items:flex-end;gap:3px;height:62px}
+.spark i{flex:1;border-radius:3px 3px 0 0;min-width:4px;transition:.3s;opacity:.92}
+.distrib{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.dchip{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft)}
+.dchip b{color:var(--ink);font-weight:700}
+
+.logitem{display:flex;gap:13px;background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:10px;padding:13px 15px;margin-bottom:9px}
+.logstripe{flex:0 0 auto}
+.li-body{flex:1;min-width:0}
+.li-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.li-when{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--stone)}
+.li-feel{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px}
+.li-text{font-size:13px;color:var(--ink-2);margin-top:3px}
+.li-note{font-size:13px;color:var(--ink-soft);margin-top:7px;padding-top:7px;border-top:1px solid var(--card-2);font-style:italic}
+.li-rpe{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft)}
+
+.empty{text-align:center;padding:54px 20px;color:var(--ink-soft)}
+.empty .em{font-size:30px;margin-bottom:10px;opacity:.5}
+.empty h3{font-family:'Space Grotesk',sans-serif;margin:0 0 6px;color:var(--ink);font-size:17px}
+.empty p{margin:0;font-size:13.5px;max-width:340px;margin-inline:auto}
+
+/* ---------- progress ---------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.kpi .v{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;line-height:1;color:var(--ink)}
+.kpi .v small{font-size:15px;color:var(--stone);font-weight:500}
+.kpi .l{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft);margin-top:8px}
+.kpi.accent{background:var(--ink);color:var(--paper)}
+.kpi.accent .v{color:var(--glow)} .kpi.accent .l{color:#A9B7AB}
+
+.phaseblk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.phaseblk h3{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:0 0 14px}
+.prow{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.prow .nm{flex:0 0 128px;font-size:13px;font-weight:500}
+.prow .tr{flex:1;height:9px;background:var(--card-2);border-radius:5px;overflow:hidden}
+.prow .tr i{display:block;height:100%;border-radius:5px;transition:width .4s}
+.prow .pc{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft);width:54px;text-align:right}
+
+.dotgrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.wdot{width:26px;height:26px;border-radius:7px;background:var(--card-2);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--stone);border:1px solid var(--line)}
+.wdot.full{background:var(--long);color:#fff;border-color:var(--long)}
+.wdot.part{border-color:var(--amber)}
+.wdot.cur{box-shadow:0 0 0 2px var(--amber)}
+
+.resetbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:22px;padding:16px 18px;background:var(--card);border:1px dashed var(--line-2);border-radius:12px;flex-wrap:wrap}
+.resetbar p{margin:0;font-size:12.5px;color:var(--ink-soft)}
+.btn.danger{background:none;border-color:var(--rust);color:var(--rust)}
+
+.loading{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;z-index:50;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+
+@media(max-width:680px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .stats{gap:16px}
+  .prow .nm{flex-basis:96px;font-size:12px}
+  .wkmeta .fo{display:none}
+  main{padding-top:16px}
+}
+</style>
+
+<div class="loading" id="loading">Loading the trail…</div>
+
+<header>
+  <div class="savedtag" id="savedtag">✓ saved</div>
+  <div class="hwrap">
+    <div class="htop">
+      <div class="title">
+        <h1>Kosci50</h1>
+        <div class="sub">50 km · 1,300 m D+ · Thu 26 Nov 2026 · Perisher → Thredbo</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v" id="kDays">—</div><div class="l">Days to race</div></div>
+        <div class="stat alt"><div class="v" id="kPct">0%</div><div class="l">Plan done</div></div>
+      </div>
+    </div>
+    <div class="ridge"><svg id="ridge" viewBox="0 0 1000 118" preserveAspectRatio="none"></svg></div>
+    <div class="phaseband" id="phaseband"></div>
+    <div style="height:14px"></div>
+  </div>
+</header>
+
+<div class="tabs"><div class="inner" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="schedule">Schedule</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="log">Feel log<span class="c" id="tabLogCount"></span></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="progress">Progress</button>
+</div></div>
+
+<main>
+  <section class="panel on" id="p-schedule"></section>
+  <section class="panel" id="p-log"></section>
+  <section class="panel" id="p-progress"></section>
+</main>
+
+<script>
+/* ===================== data ===================== */
+const RACE="2026-11-26";
+const DOW=["mon","tue","wed","thu","fri","sat","sun"];
+const DOWL=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const WEEKS=[
+{n:1,start:"2026-06-22",phase:"Reintroduction",km:28,focus:"Just get running consistently. All Z2. Learn the strength lifts light.",d:["Bike 40min Z2 (or rest)","Easy 35min + 4×20s strides · Strength A (light)","Easy 30min","Easy 35min + 4×20s strides · Strength B (light)","Rest / walk","Long easy 75min (~12 km) rolling","Opt. recovery 25min / rest"]},
+{n:2,start:"2026-06-29",phase:"Reintroduction",km:33,focus:"Add a little volume. Keep every run conversational.",d:["Bike 45min Z2","Easy 40min + 5×20s strides · Strength A","Easy 35min","Easy 40min + 5×20s strides · Strength B","Rest / easy 25min","Long easy 90min (~15 km)","Opt. recovery 30min"]},
+{n:3,start:"2026-07-06",phase:"Reintroduction",km:39,focus:"First gentle hill touches. Long run grows.",d:["Bike 50min Z2","Easy 45min + 6×20s strides · Strength A","Easy 40min","Easy 45min + 4×1min uphill steady · Strength B","Rest / easy 30min","Long easy 1h45 (~17 km) rolling","Opt. recovery 30min"]},
+{n:4,start:"2026-07-13",phase:"Reintroduction",km:44,focus:"Highest week of the block before a down week.",d:["Bike 55min Z2","Easy 50min + 6×20s strides · Strength A","Easy 45min","Hills 5×1min uphill RPE7, jog down (40min) · Strength B","Rest / easy 30min","Long easy 2h (~19 km) hilly","Recovery 35min"]},
+{n:5,start:"2026-07-20",phase:"Reintroduction",km:30,focus:"DOWN WEEK — absorb the work, let tendons adapt. Non-negotiable.",d:["Bike 40min easy","Easy 40min + strides · Strength A (light)","Easy 30min","Easy 40min · Strength B (light)","Rest","Long 1h30 easy","Rest"]},
+{n:6,start:"2026-07-27",phase:"Base + Hills",km:50,focus:"Threshold + structured hills begin. Volume steps up.",d:["Bike 60min Z2","Tempo: WU, 2×8min @ threshold (4:45/km) 2min jog, CD (~50min) · Strength A","Easy 45min","Hills 6×1min uphill RPE8, jog down (~45min) · Strength B","Easy 35min","Long 2h15 hilly, last 20min steady","Recovery 40min"]},
+{n:7,start:"2026-08-03",phase:"Base + Hills",km:55,focus:"Build aerobic ceiling and hill repeats.",d:["Bike 60min Z2","Threshold 2×10min, 2min jog (~55min) · Strength A","Easy 50min","Hills 8×1min uphill RPE8 · Strength B","Easy 35min","Long 2h30 hilly","Recovery 40min"]},
+{n:8,start:"2026-08-10",phase:"Base + Hills",km:58,focus:"Longer hill reps; add light plyometrics for tendon stiffness.",d:["Bike 70min Z2","Threshold 3×8min, 90s jog · Strength A + intro plyo","Easy 50min","Hills 5×2min uphill RPE8 · Strength B","Easy 40min","Long 2h45, target ~600 m vert","Recovery 45min"]},
+{n:9,start:"2026-08-17",phase:"Base + Hills",km:42,focus:"DOWN WEEK — recover and reset before the back-to-backs start.",d:["Bike 45min easy","Easy 45min + strides · Strength A","Easy 40min","Easy 45min + 4×1min hills · Strength B","Rest","Long 2h easy","Recovery 30min"]},
+{n:10,start:"2026-08-24",phase:"Base + Hills",km:62,focus:"First back-to-back weekend — the key ultra adaptation.",d:["Bike 70min Z2","Threshold 4×6min, 90s jog · Strength A + plyo","Easy 50min","Hills 6×2min RPE8 · Strength B","Easy 40min","Long 3h trail, ~700 m vert (B2B 1)","B2B 2: 1h easy on tired legs"]},
+{n:11,start:"2026-08-31",phase:"Base + Hills",km:66,focus:"Longer sustained climbs; B2B grows.",d:["Bike 75min, incl 3×5min tempo","Threshold 2×12min · Strength A + plyo","Easy 55min","Hills 5×3min long climbs RPE8 · Strength B","Easy 40min","Long 3h15, ~800 m vert (B2B 1)","B2B 2: 1h15 easy"]},
+{n:12,start:"2026-09-07",phase:"Specific / Peak",km:70,focus:"Race-specific phase. Start downhill conditioning + race fuelling.",d:["Bike 75min Z2","Cruise 3×10min @ threshold · Strength A + plyo","Easy 55min","Vertical: 6×3min climbs RPE8 + practise downhill control · Strength B (eccentric)","Easy 45min","Long 3h30, ~900 m vert + fuel practice (B2B 1)","B2B 2: 1h30 easy"]},
+{n:13,start:"2026-09-14",phase:"Specific / Peak",km:73,focus:"Big climbing volume; rehearse race effort within the long run.",d:["Bike 80min Z2","Threshold 4×8min · Strength A","Easy 60min","Continuous 30–40min climb effort RPE7 · Strength B (eccentric)","Easy 45min","Long 3h45, ~1000 m vert, race-effort segments (B2B 1)","B2B 2: 1h30"]},
+{n:14,start:"2026-09-21",phase:"Specific / Peak",km:52,focus:"DOWN WEEK — bank the build before the peak block.",d:["Bike 50min easy","Easy 50min + strides · Strength A (light)","Easy 45min","Hills 4×2min · Strength B","Rest","Long 2h30 moderate","Recovery 40min"]},
+{n:15,start:"2026-09-28",phase:"Specific / Peak",km:76,focus:"First 4-hour long run. Dial in kit, fuelling, descents.",d:["Bike 80min Z2","Threshold 2×15min · Strength A + plyo","Easy 60min","Vertical 7×3min hills RPE8 + downhill reps · Strength B (eccentric)","Easy 45min","Long 4h, ~1100 m vert, full kit + fuel (B2B 1)","B2B 2: 1h45"]},
+{n:16,start:"2026-10-05",phase:"Specific / Peak",km:80,focus:"Peak volume week. Practise race pacing on rolling terrain.",d:["Bike 80min Z2","Race-effort: 20min easy + 40min @ race effort, rolling · Strength A","Easy 60min","Long climb 2×20min sustained RPE7 · Strength B (eccentric)","Easy 45min","Long 4h15, ~1200 m vert (B2B 1) — closest to race demands","B2B 2: 2h easy"]},
+{n:17,start:"2026-10-12",phase:"Specific / Peak",km:78,focus:"Dress rehearsal: peak long effort ~6 weeks out. Treat it like race day.",d:["Bike 60min easy","Threshold 3×10min · Strength A","Easy 55min","Hills 6×2min · Strength B","Easy 40min","RACE SIM 4h30 — Kosci-like climbs + descents, full kit, fuel, pacing","Recovery 1h very easy"]},
+{n:18,start:"2026-10-19",phase:"Specific / Peak",km:64,focus:"Recover from the sim; stay sharp without digging deep.",d:["Bike 60min easy","Threshold 2×12min · Strength A","Easy 50min","Hills 5×2min · Strength B","Easy 40min","Long 3h moderate, ~700 m vert","Recovery 45min"]},
+{n:19,start:"2026-10-26",phase:"Specific / Peak",km:74,focus:"Final big stimulus, then the taper begins. 4 weeks out.",d:["Bike 70min Z2","Race-effort 50min with surges · Strength A (last heavier session)","Easy 55min","Vertical 6×3min hills · Strength B","Easy 40min","Long 4h, ~1000 m vert (B2B 1)","B2B 2: 1h45"]},
+{n:20,start:"2026-11-02",phase:"Taper",km:58,focus:"Taper week 1 — cut volume ~25%, hold intensity.",d:["Bike 50min easy","Threshold 3×8min (keep sharpness) · Strength A (reduced)","Easy 45min","Hills 5×2min · Strength B (light)","Easy 35min","Long 3h, ~700 m vert","Recovery 40min"]},
+{n:21,start:"2026-11-09",phase:"Taper",km:45,focus:"Taper week 2 — legs start feeling springy again.",d:["Bike 45min easy","3×6min threshold · Strength A (light — last real strength)","Easy 40min","Hills 4×90s + mobility","Easy 30min","Long 2h15 moderate","Recovery 30min"]},
+{n:22,start:"2026-11-16",phase:"Taper",km:32,focus:"Sharpening week. Sleep, eat, finalise kit + travel plans.",d:["Bike 40min easy / rest","20min easy + 5×1min @ race effort · mobility only","Easy 35min + strides","Easy 30min","Rest","Long 1h15 easy + a few race-effort surges","Recovery 25min / rest"]},
+{n:23,start:"2026-11-23",phase:"Race Week",km:0,focus:"Trust the work. Pace the first climb conservatively, fuel early and often.",d:["Easy 30min + 4×20s strides","Easy 25min relaxed","Shakeout 15min + strides · travel to Thredbo · kit check","🏁 RACE — Kosci50 (50 km / 1,300 m)","Rest / celebrate","Rest / easy walk","Rest / easy walk"]}
+];
+const PHASES=["Reintroduction","Base + Hills","Specific / Peak","Taper","Race Week"];
+const PHCOL={"Reintroduction":"#5E7E92","Base + Hills":"#5E8A6B","Specific / Peak":"#B5772E","Taper":"#8478A0","Race Week":"#DD8338"};
+const CATCOL={long:"#2F5D50",quality:"#B5772E",hills:"#8C5A3C",easy:"#6E8C7A",bike:"#4E6E82",recovery:"#93A091",rest:"#B3AC9C",race:"#DD8338"};
+const CATLAB={long:"Long",quality:"Quality",hills:"Hills",easy:"Easy",bike:"Bike",recovery:"Recovery",rest:"Rest",race:"Race"};
+const FEELS=[{n:1,e:"😣",l:"Rough",c:"var(--f1)"},{n:2,e:"😮‍💨",l:"Tough",c:"var(--f2)"},{n:3,e:"😐",l:"Steady",c:"var(--f3)"},{n:4,e:"🙂",l:"Good",c:"var(--f4)"},{n:5,e:"💪",l:"Strong",c:"var(--f5)"}];
+const FC=["","#B5523C","#C2823E","#9AA294","#6E8C7A","#3E6B53"];
+const FL=["","Rough","Tough","Steady","Good","Strong"];
+
+function cat(t){
+  if(/🏁|RACE —/.test(t))return"race";
+  if(/^Bike/.test(t))return"bike";
+  if(/Long|RACE SIM|B2B 2/.test(t))return"long";
+  if(/Hills|Vertical|[Cc]limb/.test(t))return"hills";
+  if(/Threshold|Tempo|Cruise|race effort|Race-effort|[Ii]nterval/.test(t))return"quality";
+  if(/[Rr]ecovery/.test(t))return"recovery";
+  if(/^Rest|^Opt\./.test(t))return"rest";
+  return"easy";
+}
+function isCore(t){return !/^Rest|^Opt\./.test(t);}
+const sid=(n,k)=>`${n}-${k}`;
+
+/* ===================== storage ===================== */
+const KEY="kosci50:tracker:v1";
+let state={};
+const mem={};
+async function sget(k){ if(window.storage)return window.storage.get(k); return (k in mem)?{value:mem[k]}:null; }
+async function sset(k,v){ if(window.storage)return window.storage.set(k,v); mem[k]=v; return{value:v}; }
+async function load(){ try{const r=await sget(KEY); if(r&&r.value)state=JSON.parse(r.value);}catch(e){state={};} }
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(async()=>{ try{await sset(KEY,JSON.stringify(state)); flashSaved();}catch(e){console.error("save failed",e);} },120); }
+function flashSaved(){const t=document.getElementById("savedtag");t.classList.add("on");clearTimeout(flashSaved._t);flashSaved._t=setTimeout(()=>t.classList.remove("on"),1100);}
+function rec(id){ return state[id]||(state[id]={done:false,feel:null,rpe:null,note:"",ts:null}); }
+
+/* ===================== helpers ===================== */
+function today(){return new Date();}
+function dd(iso){return new Date(iso+"T00:00:00");}
+function daysTo(iso){return Math.ceil((dd(iso)-stripTime(today()))/864e5);}
+function stripTime(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function curWeekIdx(){
+  const t=stripTime(today());
+  for(let i=0;i<WEEKS.length;i++){const s=dd(WEEKS[i].start);const e=new Date(s);e.setDate(e.getDate()+7);if(t>=s&&t<e)return i;}
+  if(t<dd(WEEKS[0].start))return -1; return WEEKS.length-1;
+}
+function fmtDate(d){return d.toLocaleDateString("en-AU",{day:"numeric",month:"short"});}
+function coreStats(){
+  let done=0,total=0;
+  WEEKS.forEach(w=>w.d.forEach((t,j)=>{if(isCore(t)){total++;if(rec(sid(w.n,DOW[j])).done)done++;}}));
+  return{done,total};
+}
+function weekProg(w){
+  let d=0,t=0; w.d.forEach((tx,j)=>{if(isCore(tx)){t++;if(rec(sid(w.n,DOW[j])).done)d++;}});
+  return{d,t,pct:t?d/t:0};
+}
+
+/* ===================== ridgeline ===================== */
+function renderRidge(){
+  const W=1000,H=118,pad=10,base=H-14,top=18,maxKm=80;
+  const n=WEEKS.length;
+  const pts=WEEKS.map((w,i)=>{
+    const x=pad+(W-2*pad)*(i/(n-1));
+    const y=base-(Math.min(w.km,maxKm)/maxKm)*(base-top);
+    return[x,w.km?y:base-6];
+  });
+  const line=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const area=`M${pts[0][0]} ${base} `+pts.map(p=>`L${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ")+` L${pts[n-1][0]} ${base} Z`;
+  const {done,total}=coreStats(); const prog=total?done/total:0;
+  const clipW=pad+(W-2*pad)*prog;
+  // today marker
+  const tt=stripTime(today()), s0=dd(WEEKS[0].start), r=dd(RACE);
+  let tf=(tt-s0)/(r-s0); tf=Math.max(0,Math.min(1,tf));
+  const tx=pad+(W-2*pad)*tf;
+  const summit=pts[n-1];
+  const svg=`
+   <defs>
+     <linearGradient id="amb" x1="0" y1="0" x2="0" y2="1">
+       <stop offset="0" stop-color="#F2A862" stop-opacity=".55"/>
+       <stop offset="1" stop-color="#DD8338" stop-opacity=".06"/>
+     </linearGradient>
+     <clipPath id="pclip"><rect x="0" y="0" width="${clipW.toFixed(1)}" height="${H}"/></clipPath>
+   </defs>
+   <path d="${area}" fill="#3A4A40" opacity=".38"/>
+   <path d="${area}" fill="url(#amb)" clip-path="url(#pclip)"/>
+   <path d="${line}" fill="none" stroke="#6F8576" stroke-width="1.4" opacity=".7"/>
+   <path d="${line}" fill="none" stroke="#F2A862" stroke-width="2.2" clip-path="url(#pclip)"/>
+   <line x1="${tx.toFixed(1)}" y1="${top-4}" x2="${tx.toFixed(1)}" y2="${base}" stroke="#EDE6D8" stroke-width="1" stroke-dasharray="2 4" opacity=".6"/>
+   <text x="${(tx+ (tf>0.85?-6:5)).toFixed(1)}" y="${top-6}" fill="#CDBFA9" font-family="Space Mono,monospace" font-size="10" text-anchor="${tf>0.85?'end':'start'}">today</text>
+   <circle cx="${(pad+(W-2*pad)*prog).toFixed(1)}" cy="${ridgeY(prog,pts).toFixed(1)}" r="4.5" fill="#F2A862" stroke="#1B2620" stroke-width="2"/>
+   <line x1="${summit[0]}" y1="${(summit[1]-2).toFixed(1)}" x2="${summit[0]}" y2="${(summit[1]-20).toFixed(1)}" stroke="#DD8338" stroke-width="1.6"/>
+   <path d="M${summit[0]} ${(summit[1]-20).toFixed(1)} l11 4 -11 4 Z" fill="#DD8338"/>
+  `;
+  document.getElementById("ridge").innerHTML=svg;
+}
+function ridgeY(frac,pts){
+  const n=pts.length, pos=frac*(n-1), i=Math.floor(pos), f=pos-i;
+  if(i>=n-1)return pts[n-1][1];
+  return pts[i][1]+(pts[i+1][1]-pts[i][1])*f;
+}
+function renderPhaseband(){
+  const counts={}; WEEKS.forEach(w=>counts[w.phase]=(counts[w.phase]||0)+1);
+  document.getElementById("phaseband").innerHTML=PHASES.map(p=>`<i style="flex:${counts[p]};background:${PHCOL[p]}"></i>`).join("");
+}
+
+/* ===================== schedule ===================== */
+let openWeek=null, openEditor=null;
+function renderSchedule(){
+  const cur=curWeekIdx();
+  if(openWeek===null)openWeek=cur>=0?cur:0;
+  const el=document.getElementById("p-schedule");
+  el.innerHTML=WEEKS.map((w,wi)=>{
+    const p=weekProg(w), isCur=wi===cur, isOpen=wi===openWeek;
+    const days=w.d.map((t,j)=>{
+      const k=DOW[j], id=sid(w.n,k), r=rec(id), c=cat(t);
+      const feel=r.feel?`<span class="feelpill"><span class="feeldot" style="background:${FC[r.feel]}"></span>${FL[r.feel]}${r.rpe?` · RPE ${r.rpe}`:""}</span>`:
+        (r.done?`<button class="logbtn" data-log="${wi}-${j}">+ how it felt</button>`:`<button class="logbtn" data-log="${wi}-${j}">+ log</button>`);
+      return `<div class="day ${r.done?'done':''}" data-day="${wi}-${j}">
+        <button class="dcheck" data-check="${wi}-${j}" aria-label="Mark done"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.3L13 4.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="dbody">
+          <div class="dtop"><span class="dow">${DOWL[j]}</span><span class="cat" style="background:${CATCOL[c]}">${CATLAB[c]}</span></div>
+          <div class="dtext">${t}</div>
+          ${feel}
+          <div class="editor" id="ed-${wi}-${j}"></div>
+        </div></div>`;
+    }).join("");
+    return `<div class="wk ${isCur?'cur':''} ${isOpen?'open':''}" data-wk="${wi}">
+      <button class="wkhead" data-head="${wi}">
+        <div class="wknum" style="background:${PHCOL[w.phase]}">${w.n}<small>WEEK</small></div>
+        <div class="wkmeta"><div class="ph">${w.phase}${w.km?` · ${w.km} km`:" · race"}</div><div class="fo">${w.focus}</div></div>
+        <div class="wkright">
+          ${isCur?'<span class="curtag">this week</span>':''}
+          <div class="wkbar"><i style="width:${(p.pct*100).toFixed(0)}%"></i></div>
+          <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </button>
+      <div class="days">${days}</div>
+    </div>`;
+  }).join("");
+  if(openEditor)buildEditor(...openEditor.split("-").map(Number));
+}
+
+function buildEditor(wi,j){
+  const w=WEEKS[wi], k=DOW[j], id=sid(w.n,k), r=rec(id);
+  const ed=document.getElementById(`ed-${wi}-${j}`); if(!ed)return;
+  ed.classList.add("on");
+  ed.innerHTML=`
+    <div class="edlab">How did it feel?</div>
+    <div class="feelrow">${FEELS.map(f=>`<button class="feelbtn" data-feel="${wi}-${j}-${f.n}" aria-pressed="${r.feel===f.n}" style="${r.feel===f.n?`background:${f.c}`:''}"><div class="fe">${f.e}</div><div class="fn">${f.l}</div></button>`).join("")}</div>
+    <div class="edrow"><div class="edlab">Effort · RPE</div><div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="rpebtn" data-rpe="${wi}-${j}-${n}" aria-pressed="${r.rpe===n}">${n}</button>`).join("")}</div></div>
+    <div class="edrow"><div class="edlab">Notes — terrain, legs, fuel, weather…</div><textarea class="notes" id="nt-${wi}-${j}" placeholder="e.g. legs heavy first climb, descents felt strong, gels every 35min worked">${r.note||""}</textarea></div>
+    <div class="eddone">
+      ${r.done?'<span class="li-when">logged · marked done</span>':`<button class="btn markdone" data-md="${wi}-${j}">Mark session done</button>`}
+      <button class="btn ghost" data-close="${wi}-${j}">Close</button>
+    </div>`;
+}
+
+/* ===================== feel log ===================== */
+function logged(){
+  const arr=[];
+  WEEKS.forEach((w,wi)=>w.d.forEach((t,j)=>{
+    const r=rec(sid(w.n,DOW[j]));
+    if(r.feel||(r.note&&r.note.trim())) arr.push({wi,j,w,t,r,c:cat(t),order:w.n*10+j});
+  }));
+  arr.sort((a,b)=>b.order-a.order);
+  return arr;
+}
+function renderLog(){
+  const items=logged().slice(); const el=document.getElementById("p-log");
+  document.getElementById("tabLogCount").textContent=items.length?items.length:"";
+  if(!items.length){
+    el.innerHTML=`<div class="empty"><div class="em">⛰</div><h3>No runs logged yet</h3><p>Tick a session off on the Schedule tab and add how it felt. Your entries will gather here, newest first, with an effort trend.</p></div>`;
+    return;
+  }
+  // trend: chronological by order
+  const chron=items.slice().sort((a,b)=>a.order-b.order).filter(x=>x.r.feel);
+  const spark = chron.length? `
+    <div class="trend">
+      <h3>How the runs have felt</h3>
+      <p>Each bar is a logged session, oldest to newest. Watch it climb as fitness returns.</p>
+      <div class="spark">${chron.map(x=>`<i title="W${x.w.n} ${DOWL[x.j]} · ${FL[x.r.feel]}" style="height:${10+x.r.feel*17}%;background:${FC[x.r.feel]}"></i>`).join("")}</div>
+      <div class="distrib">${[5,4,3,2,1].map(f=>{const c=chron.filter(x=>x.r.feel===f).length;return c?`<span class="dchip"><span class="feeldot" style="background:${FC[f]}"></span>${FL[f]} <b>${c}</b></span>`:""}).join("")}</div>
+    </div>`:"";
+  el.innerHTML=spark+items.map(x=>{
+    const r=x.r, fc=r.feel?FC[r.feel]:CATCOL[x.c];
+    return `<div class="logitem" style="border-left-color:${fc}">
+      <div class="li-body">
+        <div class="li-top">
+          <span class="li-feel" style="color:${fc}">${r.feel?FL[r.feel]:CATLAB[x.c]}</span>
+          <span class="li-when">Week ${x.w.n} · ${DOWL[x.j]}${r.rpe?` · <span class="li-rpe">RPE ${r.rpe}</span>`:""}</span>
+        </div>
+        <div class="li-text">${x.t}</div>
+        ${r.note&&r.note.trim()?`<div class="li-note">“${r.note.trim()}”</div>`:""}
+      </div></div>`;
+  }).join("");
+}
+
+/* ===================== progress ===================== */
+function renderProgress(){
+  const {done,total}=coreStats(); const pct=total?Math.round(done/total*100):0;
+  const cur=curWeekIdx(); const d2r=daysTo(RACE);
+  const lg=logged().filter(x=>x.r.feel); const avg=lg.length?(lg.reduce((s,x)=>s+x.r.feel,0)/lg.length):0;
+  const el=document.getElementById("p-progress");
+  let kpiWeek = cur<0?"Pre":(cur>=WEEKS.length-1&&d2r<0?"✓":WEEKS[cur].n);
+  const grid=`<div class="grid">
+    <div class="kpi accent"><div class="v">${d2r>0?d2r:(d2r===0?"0":"—")}</div><div class="l">${d2r>0?"Days to race":d2r===0?"Race day!":"Race done"}</div></div>
+    <div class="kpi"><div class="v">${pct}<small>%</small></div><div class="l">Plan complete</div></div>
+    <div class="kpi"><div class="v">${done}<small>/${total}</small></div><div class="l">Sessions done</div></div>
+    <div class="kpi"><div class="v">${typeof kpiWeek==="number"?kpiWeek:kpiWeek}<small>${typeof kpiWeek==="number"?"/23":""}</small></div><div class="l">Current week</div></div>
+  </div>`;
+  // phase bars
+  const pbars=PHASES.map(p=>{
+    const ws=WEEKS.filter(w=>w.phase===p); let d=0,t=0;
+    ws.forEach(w=>{const pr=weekProg(w);d+=pr.d;t+=pr.t;});
+    const pc=t?Math.round(d/t*100):0;
+    return `<div class="prow"><div class="nm">${p}</div><div class="tr"><i style="width:${pc}%;background:${PHCOL[p]}"></i></div><div class="pc">${d}/${t}</div></div>`;
+  }).join("");
+  // week dots
+  const dots=WEEKS.map((w,wi)=>{
+    const pr=weekProg(w); const cls=pr.pct>=1?"full":(pr.pct>0?"part":"");
+    return `<div class="wdot ${cls} ${wi===cur?'cur':''}" title="Week ${w.n}: ${pr.d}/${pr.t}">${w.n}</div>`;
+  }).join("");
+  const feelLine = lg.length?`<div class="prow" style="margin-top:4px"><div class="nm">Avg feel</div><div class="tr"><i style="width:${(avg/5*100).toFixed(0)}%;background:${FC[Math.round(avg)]||'#6E8C7A'}"></i></div><div class="pc">${avg.toFixed(1)}/5</div></div>`:"";
+  el.innerHTML=grid+
+    `<div class="phaseblk"><h3>Progress by phase</h3>${pbars}${feelLine}</div>`+
+    `<div class="phaseblk"><h3>The 23-week climb</h3><div class="dotgrid">${dots}</div></div>`+
+    `<div class="resetbar"><p>Reset clears every tick, feel and note. This can't be undone.</p><button class="btn danger" id="resetBtn">Reset all progress</button></div>`;
+  const rb=document.getElementById("resetBtn");
+  if(rb)rb.onclick=()=>{ if(confirm("Reset all progress? This clears every completed session, feel rating and note. It can't be undone.")){ state={}; save(); rerender(); } };
+}
+
+/* ===================== events ===================== */
+function rerender(){renderRidge();renderSchedule();renderLog();renderProgress();syncHead();}
+function syncHead(){
+  const d2r=daysTo(RACE);
+  document.getElementById("kDays").textContent=d2r>0?d2r:(d2r===0?"0":"✓");
+  const {done,total}=coreStats();
+  document.getElementById("kPct").textContent=(total?Math.round(done/total*100):0)+"%";
+}
+document.addEventListener("click",e=>{
+  const head=e.target.closest("[data-head]");
+  if(head){const wi=+head.dataset.head; openWeek=(openWeek===wi?null:wi); openEditor=null; renderSchedule(); return;}
+  const chk=e.target.closest("[data-check]");
+  if(chk){const[wi,j]=chk.dataset.check.split("-").map(Number);toggleDone(wi,j);return;}
+  const lg=e.target.closest("[data-log]");
+  if(lg){openEditor=lg.dataset.log; renderSchedule(); const node=document.getElementById(`ed-${openEditor}`); if(node)node.scrollIntoView({behavior:"smooth",block:"nearest"}); return;}
+  const fb=e.target.closest("[data-feel]");
+  if(fb){const[wi,j,f]=fb.dataset.feel.split("-").map(Number);setFeel(wi,j,f);return;}
+  const rp=e.target.closest("[data-rpe]");
+  if(rp){const[wi,j,n]=rp.dataset.rpe.split("-").map(Number);setRpe(wi,j,n);return;}
+  const md=e.target.closest("[data-md]");
+  if(md){const[wi,j]=md.dataset.md.split("-").map(Number);toggleDone(wi,j,true);return;}
+  const cl=e.target.closest("[data-close]");
+  if(cl){saveNote(...cl.dataset.close.split("-").map(Number)); openEditor=null; renderSchedule(); renderLog(); renderProgress(); return;}
+  const tab=e.target.closest(".tab");
+  if(tab){selectTab(tab.dataset.p);return;}
+});
+document.addEventListener("input",e=>{
+  if(e.target.classList.contains("notes")){
+    const id=e.target.id.replace("nt-",""); const[wi,j]=id.split("-").map(Number);
+    const w=WEEKS[wi]; rec(sid(w.n,DOW[j])).note=e.target.value; save();
+    const c=document.getElementById("tabLogCount"); // light touch; full log refresh on close
+  }
+});
+function saveNote(wi,j){const w=WEEKS[wi];const ta=document.getElementById(`nt-${wi}-${j}`);if(ta){rec(sid(w.n,DOW[j])).note=ta.value;save();}}
+function toggleDone(wi,j,force){
+  const w=WEEKS[wi], id=sid(w.n,DOW[j]), r=rec(id);
+  r.done=force?true:!r.done;
+  r.ts=r.done?new Date().toISOString():r.ts;
+  save(); renderSchedule(); renderProgress(); renderRidge(); syncHead(); renderLog();
+}
+function setFeel(wi,j,f){
+  const w=WEEKS[wi], r=rec(sid(w.n,DOW[j]));
+  r.feel=(r.feel===f?null:f);
+  if(r.feel&&!r.done){r.done=true;r.ts=new Date().toISOString();}
+  save(); buildEditor(wi,j); renderSchedule(); openEditor=`${wi}-${j}`; buildEditor(wi,j); renderProgress(); renderRidge(); syncHead();
+}
+function setRpe(wi,j,n){
+  const w=WEEKS[wi], r=rec(sid(w.n,DOW[j]));
+  r.rpe=(r.rpe===n?null:n); save(); buildEditor(wi,j);
+}
+function selectTab(p){
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.p===p));
+  document.querySelectorAll(".panel").forEach(s=>s.classList.toggle("on",s.id==="p-"+p));
+  if(p==="log")renderLog(); if(p==="progress")renderProgress();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ===================== boot ===================== */
+(async function(){
+  await load();
+  renderPhaseband(); rerender();
+  document.getElementById("loading").style.display="none";
+})();
+</script>
